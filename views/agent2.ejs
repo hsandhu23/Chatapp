@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Chat APP</title>
+	<link rel="stylesheet" type="text/css" href="/bootstrap.css" >
+	<link rel="stylesheet" type="text/css" href="/my.css" >
+	<script></script>
+</head>
+<body>
+
+<h4 id="connect"></h4>
+<div class="container mycontainer">	
+<div  class="col-lg-9" style="border:2px solid green;display:inline-block">	
+  <div id="mydiv" class="row" style="height: 300px;overflow:scroll">
+  	
+  	<div class="leftdiv" ><p class="l mssg">Hi there!</p></div>
+ 
+  </div>	
+  <div class="row">
+  <form action=<%="/chats/agent/"+id%> method="POST">	
+  	 <div class="col-lg-6" style="height: 96px"><textarea id="Textarea1" rows="1" name="message" ></textarea></div>
+    <div class="col-lg-3" style="height: 96px"><button id="sendbutton" href="" class="btn btn-primary">Send</button></div>
+</form>
+</div>
+</div>
+</div>
+<script>
+	var URL = window.location.href;
+	var messagestring=<%=JSON.stringify(chat)%>;
+	var messages = JSON.parse(messagestring);
+	messages = messages.theseChats;
+	var mycounter = document.getElementsByCLassName("mssg").length ;
+
+	function callserver(str){
+		var k;	
+		fetch(URL+str)
+		.then(function(response){
+
+			 return response.text();
+		})
+		.then(function(mystring){
+			k=JSON.parse(mystring);
+		});
+		return k;
+	}	
+	setInterval(function(){
+		var obj=callserver("/update");
+		if(obj.connected==false)
+		{
+			document.getElementById("id").innerHTML="disconnected";
+
+		}
+		else if(obj.messageno> mycounter )
+		{
+			document.getElementById("id").innerHTML="connnected";	
+			messages = callserver("/mssg");
+		}
+
+},3000);
+	setInterval(function(){
+		mycounter =document.getElementsByCLassName("mssg").length;
+		if(mycounter<messages.length)
+		{
+			for( var i=mycounter ; i<message.length ; i++ ){
+				var mydiv =document.getElementById("mydiv").innerHTML;
+				if(messages[i].sender=="agent")
+				{
+					mydiv += '<div class="leftdiv" ><p class="l mssg">'+ messages.message +'</p></div>';
+				}
+				else
+				{
+					mydiv += '<div class="rightdiv" ><p class="r mssg">'+ messages.message +'</p></div>';	
+				}
+
+			}
+		}
+},2000);
+	
+</script>	
+</body>
+</html>

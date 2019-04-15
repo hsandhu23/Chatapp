@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Chat APP</title>
+	<link rel="stylesheet" type="text/css" href="/bootstrap.css" >
+	<link rel="stylesheet" type="text/css" href="/my.css" >
+</head>
+<body>
+
+<nav class="navbar fixed-top navdbar-dark bg-dark navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Live Chat w/ text</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" >Logout <span class="sr-only">(current)</span></a>
+      </li>
+    </ul>
+ 
+  </div>
+</nav>
+
+
+
+<h4 id="connect">Blank</h4>
+<div class="container mycontainer">	
+<div  class="col-lg-9" style="border:2px solid green;display:inline-block">	
+  <div id="mydiv" class="row" style="height: 300px;overflow:scroll">
+<%var text = "";  	
+for(var i=0 ; i<chat.length ; i++ )
+{
+	
+	if(chat[i].sender=="client")
+	{
+		text += '<div class="leftdiv" ><p class="l mssg">'+chat[i].message+'</p></div>';
+	}
+	else
+	{
+		text += '<div class="rightdiv" ><p class="r mssg">'+chat[i].message+'</p></div>';
+	}
+}%>
+	<%-text%> 
+  </div>	
+  <div class="row">
+  <form action='<%="/chats/agent/"+id%>' method="POST">	
+  	 <div class="col-lg-6" style="height: 96px"><textarea id="Textarea1" rows="1" name="message" ></textarea></div>
+    <div class="col-lg-3" style="height: 96px"><button id="sendbutton" href="" class="btn btn-primary">Send</button></div>
+</form>
+</div>
+</div>
+</div>
+
+
+	
+</body>
+
+<script type="text/javascript">
+	var URL = window.location.href;
+	console.log(URL);
+	var messages;
+	var mycounter = document.querySelectorAll("p").length;
+	console.log(mycounter);
+	setInterval(function(){
+		
+		console.log("CONNECTED"); 
+		
+		fetch(URL + "/mssg")
+		.then(function(response){
+			
+			return response.text();
+		})
+		.then(function(mystring){
+			var obj=JSON.parse(mystring);
+			
+			document.querySelector("h4").innerHTML="connnected";
+			
+			if(obj.connected==false)
+			{
+				document.querySelector("h4").innerHTML="disconnected";
+
+			}
+			else if(obj.messages.length > mycounter){
+				
+				document.querySelector("h4").innerHTML="connnected";
+				
+				for( var i=mycounter ; i< obj.messages.length ; i++ ){
+				
+					console.log("message added");
+					
+					var mydiv = document.getElementById("mydiv").innerHTML ;
+					console.log(mydiv);
+					
+					if(obj.messages[i].sender=="client")
+					{
+						mydiv += "<div class='leftdiv' ><p class='l mssg'>"+ obj.messages[i].message +"</p></div>";
+					}
+					else
+					{
+						mydiv += "<div class='rightdiv' ><p class='r mssg'>"+ obj.messages[i].message +"</p></div>";	
+					}
+					console.log(mydiv);
+
+				}
+				document.getElementById("mydiv").innerHTML = mydiv ;
+				mycounter = document.querySelectorAll("p").length ; 
+			}		
+		}); 
+},3000);
+			
+
+// 			var formData = new FormData();
+// var fileField = document.querySelector("input[type='file']");
+
+// formData.append('username', 'abc123');
+// formData.append('avatar', fileField.files[0]);
+
+// fetch('https://example.com/profile/avatar', {
+//   method: 'PUT',
+//   body: formData
+// })
+// .then(response => response.json())
+// .catch(error => console.error('Error:', error))
+// .then(response => console.log('Success:', JSON.stringify(response)));
+</script>
+
+</html>
+
